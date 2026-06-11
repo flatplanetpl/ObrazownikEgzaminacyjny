@@ -28,8 +28,9 @@ export function PlanView() {
       <div>
         <h3 className="text-base font-extrabold text-accent-soft">Tryby</h3>
         <p className="mt-2 text-sm text-ink/90 sm:text-base">
-          <strong>Gra</strong> służy do testu wielokrotnego wyboru. <strong>Fiszki</strong> są do spokojnego powtarzania.{' '}
-          <strong>Galeria</strong> pozwala szybko sprawdzić cały materiał. <strong>Postęp</strong> pokazuje, co trzeba powtórzyć.
+          <strong>Gra</strong> służy do treningu wielokrotnego wyboru. <strong>Egzamin</strong> sprawdza gotowość bez
+          natychmiastowych podpowiedzi. <strong>Fiszki</strong> są do spokojnego powtarzania. <strong>Galeria</strong>{' '}
+          pozwala szybko sprawdzić cały materiał. <strong>Postęp</strong> pokazuje, co trzeba powtórzyć.
         </p>
       </div>
 

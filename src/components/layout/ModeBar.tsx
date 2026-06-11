@@ -17,13 +17,13 @@ export function ModeBar({ isFullscreen, onToggleFullscreen }: ModeBarProps) {
   const toggleMinimal = useUiStore(state => state.toggleMinimal);
 
   return (
-    <div className="glass flex shrink-0 gap-1 rounded-full p-1.5">
+    <div className="glass flex shrink-0 gap-1 rounded-2xl p-1">
       <button
         type="button"
         onClick={toggleMinimal}
         title={minimal ? 'Wyłącz tryb minimalistyczny' : 'Włącz tryb minimalistyczny'}
         aria-pressed={minimal}
-        className={`flex items-center justify-center rounded-full p-2 transition-colors sm:p-2.5 ${
+        className={`flex items-center justify-center rounded-xl p-1.5 transition-colors sm:p-2 ${
           minimal ? 'bg-accent text-bg' : 'text-ink/80 hover:text-ink'
         }`}
       >
@@ -34,7 +34,7 @@ export function ModeBar({ isFullscreen, onToggleFullscreen }: ModeBarProps) {
         onClick={onToggleFullscreen}
         title={isFullscreen ? 'Wyjdź z pełnego ekranu' : 'Pełny ekran'}
         aria-pressed={isFullscreen}
-        className="flex items-center justify-center rounded-full p-2 text-ink/80 transition-colors hover:text-ink sm:p-2.5"
+        className="flex items-center justify-center rounded-xl p-1.5 text-ink/80 transition-colors hover:text-ink sm:p-2"
       >
         {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
       </button>

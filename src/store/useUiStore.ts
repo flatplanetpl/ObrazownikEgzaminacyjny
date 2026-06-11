@@ -1,7 +1,7 @@
 /**
  * @file useUiStore.ts
  * @description Stan interfejsu: aktywna zakładka, wybrane typy pytań, filtry,
- *   tryb kolejności i tryb minimalistyczny. Część preferencji jest persystowana.
+ *   tryb kolejności, zwinięcie ustawień i tryb minimalistyczny. Część preferencji jest persystowana.
  * @dependencies zustand, zustand/middleware, ../types
  */
 
@@ -15,6 +15,9 @@ interface UiStore {
 
   minimal: boolean;
   toggleMinimal: () => void;
+
+  settingsCollapsed: boolean;
+  toggleSettingsCollapsed: () => void;
 
   questionTypes: QuestionTypeKey[];
   toggleQuestionType: (type: QuestionTypeKey) => void;
@@ -37,6 +40,9 @@ export const useUiStore = create<UiStore>()(
       minimal: false,
       toggleMinimal: () => set(state => ({ minimal: !state.minimal })),
 
+      settingsCollapsed: false,
+      toggleSettingsCollapsed: () => set(state => ({ settingsCollapsed: !state.settingsCollapsed })),
+
       questionTypes: ['artist', 'title'],
       toggleQuestionType: type =>
         set(state => {
@@ -55,7 +61,12 @@ export const useUiStore = create<UiStore>()(
     }),
     {
       name: 'obrazownik-ui-v1',
-      partialize: state => ({ minimal: state.minimal, questionTypes: state.questionTypes, orderMode: state.orderMode }),
+      partialize: state => ({
+        minimal: state.minimal,
+        settingsCollapsed: state.settingsCollapsed,
+        questionTypes: state.questionTypes,
+        orderMode: state.orderMode,
+      }),
     },
   ),
 );

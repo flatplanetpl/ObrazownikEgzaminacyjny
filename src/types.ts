@@ -8,7 +8,7 @@ export type QuestionTypeKey = 'artist' | 'title' | 'epoka' | 'style';
 
 export type OrderMode = 'smart' | 'random' | 'weak';
 
-export type TabKey = 'play' | 'learn' | 'gallery' | 'stats' | 'plan';
+export type TabKey = 'play' | 'exam' | 'learn' | 'gallery' | 'stats' | 'plan';
 
 export interface FieldProgress {
   attempts: number;

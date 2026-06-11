@@ -10,6 +10,7 @@ import { Header } from './components/layout/Header';
 import { TabNav } from './components/layout/TabNav';
 import { ModeBar } from './components/layout/ModeBar';
 import { PlayView } from './components/play/PlayView';
+import { ExamView } from './components/exam/ExamView';
 import { LearnView } from './components/learn/LearnView';
 import { GalleryView } from './components/gallery/GalleryView';
 import { StatsView } from './components/stats/StatsView';
@@ -29,7 +30,7 @@ export default function App() {
       {showHero && <Header />}
 
       <div className="mx-auto max-w-6xl">
-        <div className="sticky top-2 z-20 mb-4 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-center">
+        <div className="sticky top-2 z-20 mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center">
           <TabNav />
           <div className="self-end sm:self-auto">
             <ModeBar isFullscreen={isFullscreen} onToggleFullscreen={toggle} />
@@ -45,6 +46,7 @@ export default function App() {
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
             {activeTab === 'play' && <PlayView isFullscreen={isFullscreen} />}
+            {activeTab === 'exam' && <ExamView isFullscreen={isFullscreen} />}
             {activeTab === 'learn' && <LearnView />}
             {activeTab === 'gallery' && <GalleryView />}
             {activeTab === 'stats' && <StatsView />}
