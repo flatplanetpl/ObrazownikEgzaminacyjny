@@ -7,12 +7,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Clock3, Flag, History, Play, RotateCcw, TimerReset, XCircle } from 'lucide-react';
-import { ARTWORKS } from '../../data/artworks';
-import { EXAM_PRESETS, createExamQuestions, formatDuration, scoreExam, type ExamPreset, type ExamQuestion, type ExamResult } from '../../lib/exam';
-import { QUESTION_TYPES } from '../../lib/quiz';
+import { ARTWORKS, type Artwork } from '../../data/artworks';
+import {
+  EXAM_PRESETS,
+  createExamQuestions,
+  formatDuration,
+  scoreExam,
+  type ExamPreset,
+  type ExamQuestion,
+  type ExamResult,
+  type ExamReviewItem,
+  type ExamReviewStatus,
+} from '../../lib/exam';
+import { QUESTION_TYPES, unique } from '../../lib/quiz';
 import { useExamStore } from '../../store/useExamStore';
 import { useProgressStore } from '../../store/useProgressStore';
 import { useUiStore } from '../../store/useUiStore';
+import type { QuestionTypeKey } from '../../types';
 import { ImageStage } from '../play/ImageStage';
 import { ZoomOverlay } from '../shared/ZoomOverlay';
 
@@ -31,11 +42,70 @@ interface ActiveExam {
   endsAt: number;
 }
 
+interface ReviewEntry {
+  review: ExamReviewItem;
+  item: Artwork;
+}
+
+const QUESTION_TYPE_OPTIONS: { key: QuestionTypeKey; label: string }[] = [
+  { key: 'artist', label: 'Autor' },
+  { key: 'title', label: 'Tytuł' },
+  { key: 'epoka', label: 'Epoka' },
+  { key: 'style', label: 'Styl' },
+];
+
+const REVIEW_STATUS_META: Record<ExamReviewStatus, { label: string; badgeClassName: string }> = {
+  correct: { label: 'Poprawna', badgeClassName: 'bg-good/15 text-good' },
+  wrong: { label: 'Błąd', badgeClassName: 'bg-bad/15 text-bad' },
+  unanswered: { label: 'Bez odpowiedzi', badgeClassName: 'bg-accent/15 text-accent-soft' },
+};
+
 const RESULT_STATS = [
   { key: 'correct', label: 'Poprawne', icon: CheckCircle2, tone: 'text-good' },
   { key: 'wrong', label: 'Błędne', icon: XCircle, tone: 'text-bad' },
   { key: 'unanswered', label: 'Bez odpowiedzi', icon: Flag, tone: 'text-accent-soft' },
 ] as const;
+
+function ExamReviewCard({ entry, index }: { entry: ReviewEntry; index: number }) {
+  const { review, item } = entry;
+  const statusMeta = REVIEW_STATUS_META[review.status];
+
+  return (
+    <motion.article
+      key={`${review.itemId}-${review.questionType}-${index}`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: index * 0.025, ease: 'easeOut' }}
+      className="glass grid gap-3 rounded-2xl p-3 sm:grid-cols-[74px_1fr]"
+    >
+      <img src={item.image} alt={item.title} loading="lazy" className="h-16 w-[74px] rounded-xl bg-[#1c1f29] object-contain" />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${statusMeta.badgeClassName}`}>
+            {statusMeta.label}
+          </span>
+          <span className="text-xs font-bold text-muted">{QUESTION_TYPES[review.questionType].label}</span>
+        </div>
+        <strong className="mt-2 block text-sm font-extrabold sm:text-base">
+          {item.artist}, {item.title}
+        </strong>
+        <p className="mt-1 text-xs text-muted">
+          {item.year} · {item.epoka} · {item.style}
+        </p>
+        <div className="mt-2 grid gap-1 text-sm">
+          <span>
+            <strong className="text-good">Poprawna odpowiedź:</strong> {review.correctAnswer}
+          </span>
+          {review.status === 'wrong' && review.selectedAnswer && (
+            <span>
+              <strong className="text-bad">Wybrano:</strong> {review.selectedAnswer}
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  );
+}
 
 export function ExamView({ isFullscreen }: ExamViewProps) {
   const results = useExamStore(state => state.results);
@@ -43,6 +113,12 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
   const updateProgress = useProgressStore(state => state.updateProgress);
   const setActiveTab = useUiStore(state => state.setActiveTab);
   const setOrderMode = useUiStore(state => state.setOrderMode);
+  const periodFilter = useUiStore(state => state.periodFilter);
+  const styleFilter = useUiStore(state => state.styleFilter);
+  const questionTypes = useUiStore(state => state.questionTypes);
+  const setPeriodFilter = useUiStore(state => state.setPeriodFilter);
+  const setStyleFilter = useUiStore(state => state.setStyleFilter);
+  const toggleQuestionType = useUiStore(state => state.toggleQuestionType);
 
   const [phase, setPhase] = useState<ExamPhase>('start');
   const [activeExam, setActiveExam] = useState<ActiveExam | null>(null);
@@ -56,30 +132,62 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
   const remainingSeconds = activeExam ? Math.max(0, Math.ceil((activeExam.endsAt - now) / 1000)) : 0;
   const progressPercent = activeExam ? ((activeExam.index + 1) / activeExam.questions.length) * 100 : 0;
 
-  const resultReview = useMemo(() => {
+  const periods = useMemo(() => unique(ARTWORKS.map(item => item.epoka)), []);
+  const styles = useMemo(
+    () => unique(ARTWORKS.map(item => item.style)).sort((a, b) => a.localeCompare(b, 'pl')),
+    [],
+  );
+  const examPool = useMemo(
+    () =>
+      ARTWORKS.filter(item => {
+        const periodOk = !periodFilter || item.epoka === periodFilter;
+        const styleOk = !styleFilter || item.style === styleFilter;
+        return periodOk && styleOk;
+      }),
+    [periodFilter, styleFilter],
+  );
+  const examQuestionTypes = useMemo(
+    () => (questionTypes.length ? questionTypes : (['artist'] as QuestionTypeKey[])),
+    [questionTypes],
+  );
+  const availableQuestionCount = examPool.length * examQuestionTypes.length;
+  const activeQuestionTypeLabels = QUESTION_TYPE_OPTIONS.filter(option => examQuestionTypes.includes(option.key))
+    .map(option => option.label.toLowerCase())
+    .join(', ');
+  const minimumPresetSize = EXAM_PRESETS[0]?.questionCount ?? 0;
+
+  const resultReview = useMemo<ReviewEntry[]>(() => {
     if (!latestResult) return [];
-    return latestResult.reviewItems
-      .map(review => ({
-        review,
-        item: ARTWORKS.find(artwork => artwork.id === review.itemId),
-      }))
-      .filter(entry => Boolean(entry.item));
+    return latestResult.reviewItems.reduce<ReviewEntry[]>((entries, review) => {
+      const item = ARTWORKS.find(artwork => artwork.id === review.itemId);
+      if (item) entries.push({ review, item });
+      return entries;
+    }, []);
   }, [latestResult]);
+  const mistakeReview = useMemo(
+    () => resultReview.filter(entry => entry.review.status !== 'correct'),
+    [resultReview],
+  );
+  const correctReview = useMemo(
+    () => resultReview.filter(entry => entry.review.status === 'correct'),
+    [resultReview],
+  );
 
   const startExam = useCallback((preset: ExamPreset) => {
+    if (availableQuestionCount < preset.questionCount) return;
     const startedAt = Date.now();
     setLatestResult(null);
     setNow(startedAt);
     setActiveExam({
       preset,
-      questions: createExamQuestions(preset.questionCount),
+      questions: createExamQuestions(preset.questionCount, examPool, examQuestionTypes),
       answers: {},
       index: 0,
       startedAt,
       endsAt: startedAt + preset.limitMinutes * 60 * 1000,
     });
     setPhase('running');
-  }, []);
+  }, [availableQuestionCount, examPool, examQuestionTypes]);
 
   const saveMistakesToProgress = useCallback(
     (result: ExamResult) => {
@@ -324,51 +432,33 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
         </section>
 
         <section className="glass rounded-3xl p-4 sm:p-5">
-          <h3 className="text-lg font-extrabold">Raport błędów</h3>
-          {!resultReview.length ? (
+          <h3 className="text-lg font-extrabold">Raport błędów i braków</h3>
+          {!mistakeReview.length ? (
             <p className="mt-2 text-sm text-muted">Brak błędów i pytań bez odpowiedzi w tej sesji.</p>
           ) : (
             <div className="mt-3 grid gap-2.5">
               <AnimatePresence>
-                {resultReview.map(({ review, item }, index) => {
-                  if (!item) return null;
-                  const statusLabel = review.status === 'wrong' ? 'Błąd' : 'Bez odpowiedzi';
-                  return (
-                    <motion.article
-                      key={`${review.itemId}-${review.questionType}-${index}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: index * 0.025, ease: 'easeOut' }}
-                      className="glass grid gap-3 rounded-2xl p-3 sm:grid-cols-[74px_1fr]"
-                    >
-                      <img src={item.image} alt={item.title} loading="lazy" className="h-16 w-[74px] rounded-xl bg-[#1c1f29] object-contain" />
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${review.status === 'wrong' ? 'bg-bad/15 text-bad' : 'bg-accent/15 text-accent-soft'}`}>
-                            {statusLabel}
-                          </span>
-                          <span className="text-xs font-bold text-muted">{QUESTION_TYPES[review.questionType].label}</span>
-                        </div>
-                        <strong className="mt-2 block text-sm font-extrabold sm:text-base">
-                          {item.artist}, {item.title}
-                        </strong>
-                        <p className="mt-1 text-xs text-muted">
-                          {item.year} · {item.epoka} · {item.style}
-                        </p>
-                        <div className="mt-2 grid gap-1 text-sm">
-                          <span>
-                            <strong className="text-good">Poprawnie:</strong> {review.correctAnswer}
-                          </span>
-                          {review.selectedAnswer && (
-                            <span>
-                              <strong className="text-bad">Wybrano:</strong> {review.selectedAnswer}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.article>
-                  );
-                })}
+                {mistakeReview.map((entry, index) => (
+                  <ExamReviewCard key={`${entry.review.itemId}-${entry.review.questionType}-${index}`} entry={entry} index={index} />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </section>
+
+        <section className="glass rounded-3xl p-4 sm:p-5">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <h3 className="text-lg font-extrabold">Poprawne odpowiedzi</h3>
+            <span className="text-xs font-bold text-muted">{correctReview.length}/{latestResult.total} odpowiedzi</span>
+          </div>
+          {!correctReview.length ? (
+            <p className="mt-2 text-sm text-muted">Brak poprawnych odpowiedzi w tej sesji.</p>
+          ) : (
+            <div className="mt-3 grid gap-2.5">
+              <AnimatePresence>
+                {correctReview.map((entry, index) => (
+                  <ExamReviewCard key={`${entry.review.itemId}-${entry.review.questionType}-${index}`} entry={entry} index={index} />
+                ))}
               </AnimatePresence>
             </div>
           )}
@@ -385,7 +475,7 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
             <p className="text-xs font-black tracking-[0.2em] text-accent uppercase">Tryb egzaminacyjny</p>
             <h2 className="mt-1 text-2xl font-black sm:text-4xl">Sprawdź gotowość bez podpowiedzi</h2>
             <p className="mt-2 max-w-2xl text-sm text-muted sm:text-base">
-              Wybierz długość sesji. Feedback i pełny raport pojawią się dopiero po zakończeniu egzaminu.
+              Wybierz zakres materiału i długość sesji. Feedback i pełny raport pojawią się dopiero po zakończeniu egzaminu.
             </p>
           </div>
           <div className="glass flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-accent-soft">
@@ -393,31 +483,102 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {EXAM_PRESETS.map(preset => (
-            <motion.button
-              key={preset.questionCount}
-              type="button"
-              onClick={() => startExam(preset)}
-              whileHover={{ y: -3 }}
-              whileTap={{ scale: 0.99 }}
-              className="glass group rounded-2xl p-4 text-left transition-colors hover:border-accent/50 hover:bg-white/[0.07]"
+        <div className="mt-5 grid gap-3 border-y border-white/10 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
+          <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+            Epoka
+            <select
+              value={periodFilter}
+              onChange={event => setPeriodFilter(event.target.value)}
+              className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-ink outline-none focus:border-accent"
             >
-              <span className="flex items-center justify-between gap-3">
-                <strong className="text-lg font-black">{preset.label}</strong>
-                <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-extrabold text-accent-soft">
-                  {preset.questionCount} pytań
+              <option value="">Wszystkie epoki</option>
+              {periods.map(value => (
+                <option key={value} value={value} className="bg-bg-soft">
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+            Styl
+            <select
+              value={styleFilter}
+              onChange={event => setStyleFilter(event.target.value)}
+              className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-ink outline-none focus:border-accent"
+            >
+              <option value="">Wszystkie style</option>
+              {styles.map(value => (
+                <option key={value} value={value} className="bg-bg-soft">
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="min-w-0">
+            <span className="block text-[11px] font-black tracking-[0.16em] text-accent-soft uppercase">Pytaj o</span>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              {QUESTION_TYPE_OPTIONS.map(option => {
+                const checked = examQuestionTypes.includes(option.key);
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => toggleQuestionType(option.key)}
+                    aria-pressed={checked}
+                    className={`h-9 rounded-xl border px-3 text-xs font-extrabold transition-colors ${
+                      checked
+                        ? 'border-accent/60 bg-accent text-bg'
+                        : 'border-white/10 bg-white/[0.03] text-ink/80 hover:border-accent/45 hover:text-ink'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs font-bold text-muted">
+          Zakres: {examPool.length} dzieł · {availableQuestionCount} możliwych pytań · aktywne typy: {activeQuestionTypeLabels}.
+          {availableQuestionCount < minimumPresetSize ? ' Poszerz zakres, żeby uruchomić egzamin.' : ''}
+        </p>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {EXAM_PRESETS.map(preset => {
+            const disabled = availableQuestionCount < preset.questionCount;
+            return (
+              <motion.button
+                key={preset.questionCount}
+                type="button"
+                onClick={() => startExam(preset)}
+                disabled={disabled}
+                whileHover={disabled ? undefined : { y: -3 }}
+                whileTap={disabled ? undefined : { scale: 0.99 }}
+                className={`glass group rounded-2xl p-4 text-left transition-colors ${
+                  disabled
+                    ? 'cursor-not-allowed opacity-45'
+                    : 'hover:border-accent/50 hover:bg-white/[0.07]'
+                }`}
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <strong className="text-lg font-black">{preset.label}</strong>
+                  <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-extrabold text-accent-soft">
+                    {preset.questionCount} pytań
+                  </span>
                 </span>
-              </span>
-              <span className="mt-2 flex items-center gap-2 text-sm font-bold text-muted">
-                <Clock3 size={16} /> {preset.limitMinutes} minut
-              </span>
-              <span className="mt-3 block text-sm text-ink/85">{preset.description}</span>
-              <span className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-accent transition-transform group-hover:translate-x-1">
-                <Play size={16} /> Start
-              </span>
-            </motion.button>
-          ))}
+                <span className="mt-2 flex items-center gap-2 text-sm font-bold text-muted">
+                  <Clock3 size={16} /> {preset.limitMinutes} minut
+                </span>
+                <span className="mt-3 block text-sm text-ink/85">{preset.description}</span>
+                <span className={`mt-4 inline-flex items-center gap-2 text-sm font-extrabold transition-transform ${disabled ? 'text-muted' : 'text-accent group-hover:translate-x-1'}`}>
+                  <Play size={16} /> {disabled ? 'Za mało pytań w zakresie' : 'Start'}
+                </span>
+              </motion.button>
+            );
+          })}
         </div>
       </section>
 

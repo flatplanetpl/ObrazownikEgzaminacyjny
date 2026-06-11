@@ -23,7 +23,7 @@ export interface ExamQuestion {
   correctAnswer: string;
 }
 
-export type ExamReviewStatus = 'wrong' | 'unanswered';
+export type ExamReviewStatus = 'correct' | 'wrong' | 'unanswered';
 
 export interface ExamReviewItem {
   itemId: string;
@@ -55,10 +55,15 @@ export const EXAM_PRESETS: ExamPreset[] = [
 
 const EXAM_QUESTION_TYPES: QuestionTypeKey[] = ['artist', 'title', 'epoka', 'style'];
 
-export function createExamQuestions(questionCount: number): ExamQuestion[] {
+export function createExamQuestions(
+  questionCount: number,
+  pool: Artwork[] = ARTWORKS,
+  questionTypes: QuestionTypeKey[] = EXAM_QUESTION_TYPES,
+): ExamQuestion[] {
+  const safeQuestionTypes = questionTypes.length ? questionTypes : EXAM_QUESTION_TYPES;
   const candidates = shuffle(
-    ARTWORKS.flatMap(item =>
-      EXAM_QUESTION_TYPES.map(questionType => ({
+    pool.flatMap(item =>
+      safeQuestionTypes.map(questionType => ({
         item,
         questionType,
       })),
@@ -71,7 +76,7 @@ export function createExamQuestions(questionCount: number): ExamQuestion[] {
       id: `${candidate.item.id}-${candidate.questionType}-${index}`,
       item: candidate.item,
       questionType: candidate.questionType,
-      options: buildOptions(candidate.item, candidate.questionType, ARTWORKS, ARTWORKS),
+      options: buildOptions(candidate.item, candidate.questionType, pool, ARTWORKS),
       correctAnswer,
     };
   });
@@ -105,6 +110,13 @@ export function scoreExam(
 
     if (normalize(selectedAnswer) === normalize(question.correctAnswer)) {
       correct += 1;
+      reviewItems.push({
+        itemId: question.item.id,
+        questionType: question.questionType,
+        correctAnswer: question.correctAnswer,
+        selectedAnswer,
+        status: 'correct',
+      });
       return;
     }
 
