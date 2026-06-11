@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #f5f1e8;
+  --color-muted: #a99d8e;
+  --color-bg: #0a0c11;
+  --color-bg-soft: #12151d;
+  --color-surface: #181c26;
+  --color-accent: #ff9248;
+  --color-accent-dark: #c2570f;
+  --color-accent-soft: #ffd9b8;
+  --color-accent-2: #5eead4;
+  --color-good: #34d399;
+  --color-bad: #f87171;
+  --shadow-glow: 0 0 0 1px rgba(255, 146, 72, 0.25), 0 18px 60px -18px rgba(255, 146, 72, 0.45);
+  --shadow-panel: 0 18px 60px -24px rgba(0, 0, 0, 0.8);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply min-h-screen text-ink antialiased;
+    font-family:
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      sans-serif;
+    background-color: var(--color-bg);
+    background-image:
+      radial-gradient(circle at 12% -10%, rgba(255, 146, 72, 0.22), transparent 42%),
+      radial-gradient(circle at 88% 0%, rgba(94, 234, 212, 0.14), transparent 38%),
+      linear-gradient(180deg, #0d1018 0%, #05060a 60%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background-color: rgba(255, 146, 72, 0.35);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl;
+  }
+
+  .glass-strong {
+    @apply border border-white/10 bg-white/[0.07] backdrop-blur-2xl;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 24px rgba(255, 146, 72, 0.35);
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 146, 72, 0.4) transparent;
+  }
+}
