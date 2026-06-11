@@ -79,18 +79,18 @@ export function StatsView() {
           ))}
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2.5">
+        <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
           <button
             type="button"
             onClick={handleExport}
-            className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-extrabold text-ink/90 transition-colors hover:text-ink"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-extrabold text-ink/90 transition-colors hover:text-ink sm:w-auto"
           >
             <Download size={16} /> Eksportuj postęp JSON
           </button>
           <button
             type="button"
             onClick={handleReset}
-            className="flex items-center gap-2 rounded-full border border-bad/40 bg-bad/10 px-5 py-2.5 text-sm font-extrabold text-bad transition-colors hover:bg-bad/20"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-bad/40 bg-bad/10 px-5 py-2.5 text-sm font-extrabold text-bad transition-colors hover:bg-bad/20 sm:w-auto"
           >
             <Trash2 size={16} /> Wyczyść postęp
           </button>

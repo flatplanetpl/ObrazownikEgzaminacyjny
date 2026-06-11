@@ -42,7 +42,7 @@ export function QuizOptions({ options, correctAnswer, selected, answered, onSele
             transition={{ delay: showWrong ? 0 : index * 0.06, duration: showWrong ? 0.4 : 0.3, ease: 'easeOut' }}
             whileHover={!answered ? { scale: 1.015, y: -1 } : undefined}
             whileTap={!answered ? { scale: 0.99 } : undefined}
-            className={`flex items-start gap-3 rounded-2xl border px-4 py-3.5 text-left text-sm font-bold transition-colors sm:text-base ${
+            className={`flex items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-bold transition-colors sm:px-4 sm:py-3.5 sm:text-base ${
               showCorrect
                 ? 'border-good/60 bg-good/15 text-ink shadow-[0_0_28px_-6px_rgba(52,211,153,0.55)]'
                 : showWrong

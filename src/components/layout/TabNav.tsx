@@ -32,7 +32,7 @@ export function TabNav() {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`relative shrink-0 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors ${
+            className={`relative shrink-0 rounded-full px-3 py-2 text-xs font-bold whitespace-nowrap transition-colors sm:px-4 sm:text-sm ${
               isActive ? 'text-bg' : 'text-ink/80 hover:text-ink'
             }`}
           >

@@ -33,8 +33,8 @@ export function ImageStage({ item, total, isFullscreen, onZoom }: ImageStageProp
         </button>
       </div>
       <div
-        className={`grid place-items-center bg-[#1c1f29] p-4 sm:p-6 ${
-          isFullscreen ? 'min-h-[60vh]' : 'min-h-[320px] sm:min-h-[460px]'
+        className={`grid place-items-center bg-[#1c1f29] p-3 sm:p-6 ${
+          isFullscreen ? 'min-h-[45vh] sm:min-h-[60vh]' : 'min-h-[240px] sm:min-h-[460px]'
         }`}
       >
         <AnimatePresence mode="wait">
@@ -48,7 +48,7 @@ export function ImageStage({ item, total, isFullscreen, onZoom }: ImageStageProp
               src={item.image}
               alt={`Dzieło ze slajdu ${item.slide}`}
               className={`max-w-full rounded-2xl bg-white object-contain shadow-[0_18px_44px_-12px_rgba(0,0,0,0.6)] ${
-                isFullscreen ? 'max-h-[70vh]' : 'max-h-[60vh]'
+                isFullscreen ? 'max-h-[55vh] sm:max-h-[70vh]' : 'max-h-[40vh] sm:max-h-[60vh]'
               }`}
             />
           )}

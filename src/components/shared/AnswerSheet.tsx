@@ -27,9 +27,9 @@ export function AnswerSheet({ item }: AnswerSheetProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="glass rounded-2xl p-4 sm:p-5"
+      className="glass rounded-2xl p-3 sm:p-5"
     >
-      <dl className="grid grid-cols-[110px_1fr] gap-x-3 gap-y-2 text-sm">
+      <dl className="grid grid-cols-[84px_1fr] gap-x-2 gap-y-2 text-sm sm:grid-cols-[110px_1fr] sm:gap-x-3">
         {ROWS.map(row => (
           <div key={row.label} className="contents">
             <dt className="font-extrabold text-accent-soft">{row.label}</dt>

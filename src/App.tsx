@@ -29,9 +29,11 @@ export default function App() {
       {showHero && <Header />}
 
       <div className="mx-auto max-w-6xl">
-        <div className="sticky top-2 z-20 mb-6 flex items-center gap-2">
+        <div className="sticky top-2 z-20 mb-4 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-center">
           <TabNav />
-          <ModeBar isFullscreen={isFullscreen} onToggleFullscreen={toggle} />
+          <div className="self-end sm:self-auto">
+            <ModeBar isFullscreen={isFullscreen} onToggleFullscreen={toggle} />
+          </div>
         </div>
 
         <AnimatePresence mode="wait">

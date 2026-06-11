@@ -64,7 +64,7 @@ export function LearnView() {
               <button
                 type="button"
                 onClick={() => setRevealed(true)}
-                className="mt-auto w-fit rounded-full bg-accent px-5 py-2.5 text-sm font-extrabold text-bg shadow-[0_10px_30px_-10px_rgba(255,146,72,0.8)] transition-transform hover:-translate-y-0.5"
+                className="mt-auto w-full rounded-full bg-accent px-5 py-2.5 text-center text-sm font-extrabold text-bg shadow-[0_10px_30px_-10px_rgba(255,146,72,0.8)] transition-transform hover:-translate-y-0.5 sm:w-fit"
               >
                 Odsłoń odpowiedź
               </button>
@@ -75,18 +75,18 @@ export function LearnView() {
               style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
             >
               {revealed && <AnswerSheet item={current} />}
-              <div className="mt-auto flex flex-wrap gap-2.5">
+              <div className="mt-auto flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
                 <button
                   type="button"
                   onClick={() => mark(false)}
-                  className="flex items-center gap-2 rounded-full border border-bad/40 bg-bad/10 px-5 py-2.5 text-sm font-extrabold text-bad transition-colors hover:bg-bad/20"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-bad/40 bg-bad/10 px-5 py-2.5 text-sm font-extrabold text-bad transition-colors hover:bg-bad/20 sm:w-auto"
                 >
                   <X size={16} /> Nie pamiętam
                 </button>
                 <button
                   type="button"
                   onClick={() => mark(true)}
-                  className="flex items-center gap-2 rounded-full border border-good/40 bg-good/10 px-5 py-2.5 text-sm font-extrabold text-good transition-colors hover:bg-good/20"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-good/40 bg-good/10 px-5 py-2.5 text-sm font-extrabold text-good transition-colors hover:bg-good/20 sm:w-auto"
                 >
                   <Check size={16} /> Pamiętam
                 </button>
@@ -97,7 +97,7 @@ export function LearnView() {
           <button
             type="button"
             onClick={pickCard}
-            className="w-fit rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-extrabold text-ink/90 transition-colors hover:text-ink"
+            className="w-full rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-center text-sm font-extrabold text-ink/90 transition-colors hover:text-ink sm:w-fit"
           >
             Następna
           </button>

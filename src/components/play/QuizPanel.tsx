@@ -86,11 +86,11 @@ export function QuizPanel({ game }: QuizPanelProps) {
 
       <AnimatePresence>{showAnswerSheet && <AnswerSheet item={current} />}</AnimatePresence>
 
-      <div className="mt-auto flex flex-wrap gap-2.5 pt-1">
+      <div className="mt-auto flex flex-col gap-2.5 pt-1 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           onClick={chooseQuestion}
-          className="rounded-full bg-accent px-5 py-2.5 text-sm font-extrabold text-bg shadow-[0_10px_30px_-10px_rgba(255,146,72,0.8)] transition-transform hover:-translate-y-0.5"
+          className="w-full rounded-full bg-accent px-5 py-2.5 text-center text-sm font-extrabold text-bg shadow-[0_10px_30px_-10px_rgba(255,146,72,0.8)] transition-transform hover:-translate-y-0.5 sm:w-auto"
         >
           Nowe pytanie
         </button>
@@ -98,7 +98,7 @@ export function QuizPanel({ game }: QuizPanelProps) {
           <button
             type="button"
             onClick={revealAnswer}
-            className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-extrabold text-ink/90 transition-colors hover:text-ink"
+            className="w-full rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-center text-sm font-extrabold text-ink/90 transition-colors hover:text-ink sm:w-auto"
           >
             Pokaż fiszkę
           </button>
@@ -109,7 +109,7 @@ export function QuizPanel({ game }: QuizPanelProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             onClick={chooseQuestion}
-            className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-extrabold text-ink/90 transition-colors hover:text-ink"
+            className="w-full rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-center text-sm font-extrabold text-ink/90 transition-colors hover:text-ink sm:w-auto"
           >
             Dalej
           </motion.button>

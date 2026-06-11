@@ -23,7 +23,7 @@ export function ModeBar({ isFullscreen, onToggleFullscreen }: ModeBarProps) {
         onClick={toggleMinimal}
         title={minimal ? 'Wyłącz tryb minimalistyczny' : 'Włącz tryb minimalistyczny'}
         aria-pressed={minimal}
-        className={`flex items-center justify-center rounded-full p-2.5 transition-colors ${
+        className={`flex items-center justify-center rounded-full p-2 transition-colors sm:p-2.5 ${
           minimal ? 'bg-accent text-bg' : 'text-ink/80 hover:text-ink'
         }`}
       >
@@ -34,7 +34,7 @@ export function ModeBar({ isFullscreen, onToggleFullscreen }: ModeBarProps) {
         onClick={onToggleFullscreen}
         title={isFullscreen ? 'Wyjdź z pełnego ekranu' : 'Pełny ekran'}
         aria-pressed={isFullscreen}
-        className="flex items-center justify-center rounded-full p-2.5 text-ink/80 transition-colors hover:text-ink"
+        className="flex items-center justify-center rounded-full p-2 text-ink/80 transition-colors hover:text-ink sm:p-2.5"
       >
         {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
       </button>
