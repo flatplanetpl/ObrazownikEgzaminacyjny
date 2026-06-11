@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, Clock3, Flag, History, Play, RotateCcw, TimerReset, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock3, Flag, History, Play, RotateCcw, SlidersHorizontal, TimerReset, XCircle } from 'lucide-react';
 import { ARTWORKS, type Artwork } from '../../data/artworks';
 import {
   EXAM_PRESETS,
@@ -483,68 +483,82 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 border-y border-white/10 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
-          <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
-            Epoka
-            <select
-              value={periodFilter}
-              onChange={event => setPeriodFilter(event.target.value)}
-              className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-ink outline-none focus:border-accent"
-            >
-              <option value="">Wszystkie epoki</option>
-              {periods.map(value => (
-                <option key={value} value={value} className="bg-bg-soft">
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
-            Styl
-            <select
-              value={styleFilter}
-              onChange={event => setStyleFilter(event.target.value)}
-              className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-ink outline-none focus:border-accent"
-            >
-              <option value="">Wszystkie style</option>
-              {styles.map(value => (
-                <option key={value} value={value} className="bg-bg-soft">
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <div className="min-w-0">
-            <span className="block text-[11px] font-black tracking-[0.16em] text-accent-soft uppercase">Pytaj o</span>
-            <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              {QUESTION_TYPE_OPTIONS.map(option => {
-                const checked = examQuestionTypes.includes(option.key);
-                return (
-                  <button
-                    key={option.key}
-                    type="button"
-                    onClick={() => toggleQuestionType(option.key)}
-                    aria-pressed={checked}
-                    className={`h-9 rounded-xl border px-3 text-xs font-extrabold transition-colors ${
-                      checked
-                        ? 'border-accent/60 bg-accent text-bg'
-                        : 'border-white/10 bg-white/[0.03] text-ink/80 hover:border-accent/45 hover:text-ink'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
+        <div className="mt-5 rounded-2xl border border-accent/25 bg-white/[0.035] p-4 shadow-[0_16px_48px_-28px_rgba(255,146,72,0.65)] sm:p-5">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <span className="flex items-center gap-2 text-xs font-black tracking-[0.18em] text-accent-soft uppercase">
+                <SlidersHorizontal size={16} /> Ustawienia egzaminu
+              </span>
+              <h3 className="mt-1 text-lg font-extrabold">Z czego ma pytać</h3>
             </div>
+            <span className="text-xs font-bold text-muted">
+              {examPool.length} dzieł · {availableQuestionCount} możliwych pytań
+            </span>
           </div>
-        </div>
 
-        <p className="mt-3 text-xs font-bold text-muted">
-          Zakres: {examPool.length} dzieł · {availableQuestionCount} możliwych pytań · aktywne typy: {activeQuestionTypeLabels}.
-          {availableQuestionCount < minimumPresetSize ? ' Poszerz zakres, żeby uruchomić egzamin.' : ''}
-        </p>
+          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(280px,auto)] lg:items-end">
+            <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+              Epoka
+              <select
+                value={periodFilter}
+                onChange={event => setPeriodFilter(event.target.value)}
+                className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-ink outline-none focus:border-accent"
+              >
+                <option value="">Wszystkie epoki</option>
+                {periods.map(value => (
+                  <option key={value} value={value} className="bg-bg-soft">
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+              Styl
+              <select
+                value={styleFilter}
+                onChange={event => setStyleFilter(event.target.value)}
+                className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-ink outline-none focus:border-accent"
+              >
+                <option value="">Wszystkie style</option>
+                {styles.map(value => (
+                  <option key={value} value={value} className="bg-bg-soft">
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <fieldset className="min-w-0">
+              <legend className="text-[11px] font-black tracking-[0.16em] text-accent-soft uppercase">Typy pytań</legend>
+              <div className="mt-1 grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap">
+                {QUESTION_TYPE_OPTIONS.map(option => {
+                  const checked = examQuestionTypes.includes(option.key);
+                  return (
+                    <button
+                      key={option.key}
+                      type="button"
+                      onClick={() => toggleQuestionType(option.key)}
+                      aria-pressed={checked}
+                      className={`h-10 rounded-xl border px-3 text-xs font-extrabold transition-colors ${
+                        checked
+                          ? 'border-accent/60 bg-accent text-bg shadow-[0_8px_24px_-12px_rgba(255,146,72,0.9)]'
+                          : 'border-white/10 bg-white/[0.03] text-ink/80 hover:border-accent/45 hover:text-ink'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+          </div>
+
+          <p className="mt-3 text-xs font-bold text-muted">
+            Aktywne typy: {activeQuestionTypeLabels}.
+            {availableQuestionCount < minimumPresetSize ? ' Poszerz zakres, żeby uruchomić egzamin.' : ''}
+          </p>
+        </div>
 
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           {EXAM_PRESETS.map(preset => {

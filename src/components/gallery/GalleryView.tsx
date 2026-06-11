@@ -47,19 +47,19 @@ export function GalleryView() {
         Widoczne: <strong className="text-ink">{visible.length}</strong> z {ARTWORKS.length} dzieł.
       </p>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {visible.map((item, index) => (
           <motion.article
             key={item.id}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: Math.min(index, 24) * 0.015, ease: 'easeOut' }}
-            className="glass flex flex-col overflow-hidden rounded-2xl"
+            className="glass flex min-h-full flex-col overflow-hidden rounded-2xl"
           >
-            <div className="grid h-32 place-items-center bg-[#1c1f29] p-2 sm:h-36">
-              <img src={item.image} alt={item.title} loading="lazy" className="max-h-full max-w-full rounded-lg object-contain" />
+            <div className="grid aspect-[4/3] shrink-0 place-items-center overflow-hidden bg-[#1c1f29] p-3">
+              <img src={item.image} alt={item.title} loading="lazy" className="block h-full w-full object-contain" />
             </div>
-            <div className="flex flex-1 flex-col gap-1.5 p-3">
+            <div className="relative z-10 flex flex-1 flex-col gap-1.5 border-t border-white/10 bg-bg-soft/75 p-3">
               <h3 className="text-sm leading-tight font-extrabold">{item.title}</h3>
               <p className="text-xs text-muted">{item.artist}</p>
               <p className="text-xs text-muted">
