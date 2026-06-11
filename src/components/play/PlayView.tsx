@@ -51,12 +51,14 @@ export function PlayView({ isFullscreen }: PlayViewProps) {
       {!isFullscreen && <ControlsPanel />}
 
       <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-        <ImageStage
-          item={game.current}
-          total={ARTWORKS.length}
-          isFullscreen={isFullscreen}
-          onZoom={() => setZoomSrc(game.current?.image ?? null)}
-        />
+        <div className="sticky top-[6.5rem] z-10 self-start sm:top-16">
+          <ImageStage
+            item={game.current}
+            total={ARTWORKS.length}
+            isFullscreen={isFullscreen}
+            onZoom={() => setZoomSrc(game.current?.image ?? null)}
+          />
+        </div>
         <QuizPanel game={game} />
       </div>
 
