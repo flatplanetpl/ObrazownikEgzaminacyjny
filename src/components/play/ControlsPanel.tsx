@@ -70,14 +70,14 @@ export function ControlsPanel() {
       </button>
 
       {!settingsCollapsed && (
-        <div className="mt-2 grid gap-2 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
-          <div className="grid gap-2 sm:grid-cols-3">
-            <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+        <div className="mt-2 grid min-w-0 gap-2 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+          <div className="grid min-w-0 gap-2 sm:grid-cols-3">
+            <label className="flex min-w-0 flex-col gap-1 text-[11px] font-bold text-muted">
               Epoka
               <select
                 value={periodFilter}
                 onChange={e => setPeriodFilter(e.target.value)}
-                className="h-9 rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-semibold text-ink outline-none focus:border-accent"
+                className="h-9 w-full min-w-0 max-w-full rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-semibold text-ink outline-none focus:border-accent"
               >
                 <option value="">Wszystkie epoki</option>
                 {periods.map(value => (
@@ -87,12 +87,12 @@ export function ControlsPanel() {
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+            <label className="flex min-w-0 flex-col gap-1 text-[11px] font-bold text-muted">
               Styl
               <select
                 value={styleFilter}
                 onChange={e => setStyleFilter(e.target.value)}
-                className="h-9 rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-semibold text-ink outline-none focus:border-accent"
+                className="h-9 w-full min-w-0 max-w-full rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-semibold text-ink outline-none focus:border-accent"
               >
                 <option value="">Wszystkie style</option>
                 {styles.map(value => (
@@ -102,12 +102,12 @@ export function ControlsPanel() {
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-[11px] font-bold text-muted">
+            <label className="flex min-w-0 flex-col gap-1 text-[11px] font-bold text-muted">
               Kolejność
               <select
                 value={orderMode}
                 onChange={e => setOrderMode(e.target.value as OrderMode)}
-                className="h-9 rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-semibold text-ink outline-none focus:border-accent"
+                className="h-9 w-full min-w-0 max-w-full rounded-xl border border-white/10 bg-white/5 px-2.5 text-sm font-semibold text-ink outline-none focus:border-accent"
               >
                 {ORDER_MODES.map(mode => (
                   <option key={mode.key} value={mode.key} className="bg-bg-soft">
@@ -118,8 +118,8 @@ export function ControlsPanel() {
             </label>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 xl:justify-end">
-            <span className="mr-1 text-[11px] font-black tracking-[0.16em] text-accent-soft uppercase">Pytaj</span>
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5 xl:justify-end">
+            <span className="mr-1 shrink-0 text-[11px] font-black tracking-[0.16em] text-accent-soft uppercase">Pytaj</span>
             {QUESTION_TYPE_LABELS.map(option => {
               const checked = questionTypes.includes(option.key);
               return (
