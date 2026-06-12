@@ -6,7 +6,19 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, Clock3, Flag, History, Play, RotateCcw, SlidersHorizontal, TimerReset, XCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  Flag,
+  History,
+  Maximize2,
+  Play,
+  RotateCcw,
+  SlidersHorizontal,
+  TimerReset,
+  XCircle,
+} from 'lucide-react';
 import { ARTWORKS, type Artwork } from '../../data/artworks';
 import {
   EXAM_PRESETS,
@@ -24,7 +36,6 @@ import { useExamStore } from '../../store/useExamStore';
 import { useProgressStore } from '../../store/useProgressStore';
 import { useUiStore } from '../../store/useUiStore';
 import type { QuestionTypeKey } from '../../types';
-import { ImageStage } from '../play/ImageStage';
 import { ZoomOverlay } from '../shared/ZoomOverlay';
 
 interface ExamViewProps {
@@ -288,12 +299,12 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
     const timeDanger = remainingSeconds <= 60;
 
     return (
-      <div className="space-y-4">
-        <section className="glass flex flex-col gap-3 rounded-3xl p-4 sm:p-5">
+      <div className={`flex flex-col gap-3 overflow-hidden ${isFullscreen ? 'h-[calc(100svh-1rem)]' : 'h-[calc(100svh-5.25rem)]'}`}>
+        <section className="glass flex shrink-0 flex-col gap-2 rounded-3xl p-3 sm:gap-3 sm:p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="text-xs font-black tracking-[0.2em] text-accent uppercase">Egzamin</p>
-              <h2 className="text-lg font-extrabold sm:text-xl">{activeExam.preset.label}</h2>
+              <h2 className="text-base font-extrabold sm:text-xl">{activeExam.preset.label}</h2>
             </div>
             <div className="flex flex-wrap gap-2 text-xs font-bold sm:text-sm">
               <span className="glass rounded-full px-3 py-1.5">
@@ -316,24 +327,46 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
           </div>
         </section>
 
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-          <div className="sticky top-[6.5rem] z-10 self-start sm:top-16">
-            <ImageStage
-              item={currentQuestion.item}
-              total={ARTWORKS.length}
-              isFullscreen={isFullscreen}
-              onZoom={() => setZoomSrc(currentQuestion.item.image)}
-            />
+        <section className="glass-strong grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-3 rounded-3xl p-3 sm:p-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] lg:grid-rows-none">
+          <div className="flex min-h-0 flex-col gap-2">
+            <div className="flex shrink-0 items-center justify-between gap-3">
+              <span className="text-xs font-extrabold tracking-wide text-accent-soft sm:text-sm">
+                Slajd {currentQuestion.item.slide}
+              </span>
+            </div>
+            <motion.button
+              type="button"
+              onClick={() => setZoomSrc(currentQuestion.item.image)}
+              aria-label={`Powiększ dzieło: ${currentQuestion.item.title}`}
+              title="Powiększ"
+              whileTap={{ scale: 0.995 }}
+              className="group relative grid h-[clamp(10rem,32svh,22rem)] min-h-0 place-items-center overflow-hidden rounded-[1.35rem] bg-[#1c1f29] p-2 outline-none ring-accent/60 transition-[box-shadow,transform] focus-visible:ring-2 sm:h-[clamp(15rem,48svh,32rem)] sm:p-3 lg:h-auto lg:flex-1"
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentQuestion.item.id}
+                  initial={{ opacity: 0, scale: 0.96, filter: 'blur(6px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.32, ease: 'easeOut' }}
+                  src={currentQuestion.item.image}
+                  alt={`Dzieło ze slajdu ${currentQuestion.item.slide}`}
+                  className="max-h-full max-w-full rounded-2xl bg-white object-contain shadow-[0_18px_44px_-12px_rgba(0,0,0,0.6)]"
+                />
+              </AnimatePresence>
+              <span className="absolute top-2 right-2 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/35 text-white opacity-90 backdrop-blur transition-colors group-hover:bg-black/55 sm:top-3 sm:right-3">
+                <Maximize2 size={16} />
+              </span>
+            </motion.button>
           </div>
 
-          <article className="glass-strong flex flex-col gap-4 rounded-3xl p-4 sm:p-6">
-            <div>
+          <article className="flex min-h-0 flex-col gap-3">
+            <div className="shrink-0">
               <p className="mb-1 text-xs font-black tracking-[0.2em] text-accent uppercase">{questionLabel}</p>
-              <h2 className="text-lg font-extrabold sm:text-xl">{QUESTION_TYPES[currentQuestion.questionType].prompt()}</h2>
-              <p className="mt-2 text-sm text-muted">Odpowiedź możesz zmienić do momentu przejścia dalej.</p>
+              <h2 className="text-base font-extrabold leading-tight sm:text-xl">{QUESTION_TYPES[currentQuestion.questionType].prompt()}</h2>
             </div>
 
-            <div role="list" className="grid gap-2.5">
+            <div role="list" className="scrollbar-thin grid min-h-0 flex-1 content-start gap-2 overflow-y-auto pr-1">
               {currentQuestion.options.map((option, index) => {
                 const isSelected = selectedAnswer === option;
                 return (
@@ -347,7 +380,7 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
                     transition={{ delay: index * 0.04, duration: 0.25, ease: 'easeOut' }}
                     whileHover={{ scale: 1.015, y: -1 }}
                     whileTap={{ scale: 0.99 }}
-                    className={`flex items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-bold transition-colors sm:px-4 sm:py-3.5 sm:text-base ${
+                    className={`flex min-h-11 items-start gap-3 rounded-2xl border px-3 py-2.5 text-left text-sm font-bold transition-colors sm:min-h-12 sm:px-4 sm:py-3 sm:text-base ${
                       isSelected
                         ? 'border-accent/70 bg-accent/15 text-ink shadow-[0_0_26px_-8px_rgba(255,146,72,0.75)]'
                         : 'border-white/10 bg-white/[0.03] text-ink/90 hover:border-accent/50 hover:bg-white/[0.06]'
@@ -362,26 +395,27 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
               })}
             </div>
 
-            <div className="mt-auto flex flex-col gap-2.5 pt-1 sm:flex-row sm:flex-wrap">
+            <div className="grid shrink-0 grid-cols-[minmax(6.5rem,auto)_1fr] gap-2 pt-1">
               <button
                 type="button"
                 onClick={requestFinish}
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-bad/40 bg-bad/10 px-5 py-2.5 text-sm font-extrabold text-bad transition-colors hover:bg-bad/20 sm:w-auto"
+                className="flex items-center justify-center gap-2 rounded-full border border-bad/40 bg-bad/10 px-3 py-2.5 text-sm font-extrabold text-bad transition-colors hover:bg-bad/20 sm:px-5"
               >
                 <Flag size={16} /> Zakończ
               </button>
               <button
                 type="button"
                 onClick={goNext}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-extrabold text-bg shadow-[0_10px_30px_-10px_rgba(255,146,72,0.8)] transition-transform hover:-translate-y-0.5 sm:w-auto"
+                className="flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-extrabold text-bg shadow-[0_10px_30px_-10px_rgba(255,146,72,0.8)] transition-transform hover:-translate-y-0.5"
               >
                 {currentNumber === activeExam.questions.length ? 'Zakończ i pokaż wynik' : 'Dalej'}
+                <ArrowRight size={16} />
               </button>
             </div>
           </article>
-        </div>
+        </section>
 
-        <ZoomOverlay src={zoomSrc} alt="Powiększenie dzieła" onClose={() => setZoomSrc(null)} />
+        <ZoomOverlay src={zoomSrc} alt={`Powiększenie: ${currentQuestion.item.title}`} onClose={() => setZoomSrc(null)} />
       </div>
     );
   }

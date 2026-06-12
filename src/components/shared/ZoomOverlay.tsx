@@ -21,7 +21,7 @@ export function ZoomOverlay({ src, alt, onClose }: ZoomOverlayProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 backdrop-blur-sm sm:p-6"
+          className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/85 p-3 backdrop-blur-sm sm:p-6"
           onClick={onClose}
         >
           <motion.img
@@ -31,7 +31,8 @@ export function ZoomOverlay({ src, alt, onClose }: ZoomOverlayProps) {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             src={src}
             alt={alt}
-            className="max-h-full max-w-full rounded-2xl object-contain shadow-[0_30px_120px_-30px_rgba(0,0,0,0.9)]"
+            onClick={event => event.stopPropagation()}
+            className="max-h-full max-w-full cursor-default rounded-2xl object-contain shadow-[0_30px_120px_-30px_rgba(0,0,0,0.9)]"
           />
           <button
             type="button"
