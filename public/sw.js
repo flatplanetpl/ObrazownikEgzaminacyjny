@@ -4,7 +4,7 @@
  * @dependencies Cache API, Service Worker API
  */
 
-const CACHE_NAME = 'obrazownik-egzaminacyjny-v3';
+const CACHE_NAME = 'obrazownik-egzaminacyjny-v4';
 const STATIC_URLS = [
   'manifest.webmanifest',
   'icons/icon-192.png',
@@ -51,17 +51,44 @@ self.addEventListener('activate', event => {
   );
 });
 
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    event.waitUntil(self.skipWaiting());
+  }
+});
+
+async function putSuccessfulResponse(request, response) {
+  if (!response || response.status !== 200 || response.type === 'opaque') return;
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(request, response.clone());
+}
+
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    await putSuccessfulResponse(request, response);
+    return response;
+  } catch {
+    return (await caches.match(request)) || (await caches.match('index.html')) || Response.error();
+  }
+}
+
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+
+  const response = await fetch(request);
+  await putSuccessfulResponse(request, response);
+  return response;
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-        return response;
-      });
-    }),
-  );
+  if (event.request.mode === 'navigate') {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
+
+  event.respondWith(cacheFirst(event.request));
 });
