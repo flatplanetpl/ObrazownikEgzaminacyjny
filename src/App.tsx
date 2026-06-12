@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/layout/Header';
 import { TabNav } from './components/layout/TabNav';
 import { ModeBar } from './components/layout/ModeBar';
+import { MobileInstallButton } from './components/layout/MobileInstallButton';
 import { PlayView } from './components/play/PlayView';
 import { ExamView } from './components/exam/ExamView';
 import { LearnView } from './components/learn/LearnView';
@@ -32,7 +33,8 @@ export default function App() {
       <div className="mx-auto max-w-6xl">
         <div className="sticky top-2 z-20 mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center">
           <TabNav />
-          <div className="self-end sm:self-auto">
+          <div className="flex self-end gap-2 sm:self-auto">
+            <MobileInstallButton />
             <ModeBar isFullscreen={isFullscreen} onToggleFullscreen={toggle} />
           </div>
         </div>

@@ -4,7 +4,15 @@
  * @dependencies Cache API, Service Worker API
  */
 
-const CACHE_NAME = 'obrazownik-egzaminacyjny-v2';
+const CACHE_NAME = 'obrazownik-egzaminacyjny-v3';
+const STATIC_URLS = [
+  'manifest.webmanifest',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'icons/maskable-192.png',
+  'icons/maskable-512.png',
+  'icons/apple-touch-icon.png',
+];
 const IMAGE_URLS = Array.from({ length: 129 }, (_, index) => {
   const number = String(index + 2).padStart(3, '0');
   return `images/art_${number}.jpg`;
@@ -14,7 +22,7 @@ async function appShellUrls() {
   const response = await fetch('index.html', { cache: 'reload' });
   const html = await response.text();
   const assets = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)].map(match => match[1]);
-  return ['.', 'index.html', ...assets];
+  return ['.', 'index.html', ...STATIC_URLS, ...assets];
 }
 
 self.addEventListener('install', event => {
