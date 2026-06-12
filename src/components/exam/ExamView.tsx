@@ -299,7 +299,7 @@ export function ExamView({ isFullscreen }: ExamViewProps) {
     const timeDanger = remainingSeconds <= 60;
 
     return (
-      <div className={`flex flex-col gap-2 overflow-hidden sm:gap-3 ${isFullscreen ? 'h-[calc(100svh-1rem)]' : 'h-[calc(100svh-4.75rem)] sm:h-[calc(100svh-5.25rem)]'}`}>
+      <div className={`exam-running-shell flex flex-col gap-2 overflow-hidden sm:gap-3 ${isFullscreen ? 'exam-running-shell--fullscreen' : ''}`}>
         <section className="glass flex shrink-0 flex-col gap-1.5 rounded-2xl p-2.5 sm:gap-3 sm:rounded-3xl sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">

@@ -51,7 +51,7 @@ export function PlayView({ isFullscreen }: PlayViewProps) {
       {!isFullscreen && <ControlsPanel />}
 
       <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-        <div className="sticky top-[6.5rem] z-10 self-start sm:top-16">
+        <div className="app-sticky-stage sticky z-10 self-start">
           <ImageStage
             item={game.current}
             total={ARTWORKS.length}

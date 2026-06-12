@@ -146,7 +146,7 @@ export function MobileInstallButton() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 28 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="fixed inset-x-2 bottom-2 z-50 rounded-3xl border border-white/12 bg-bg-soft/95 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_24px_90px_-24px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:hidden"
+              className="safe-mobile-sheet fixed z-50 rounded-3xl border border-white/12 bg-bg-soft/95 p-4 shadow-[0_24px_90px_-24px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:hidden"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>

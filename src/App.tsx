@@ -27,11 +27,11 @@ export default function App() {
   const showHero = !minimal && !isFullscreen;
 
   return (
-    <div className={`min-h-screen pb-16 transition-[padding] ${isFullscreen ? 'px-2 pt-2' : 'px-3 sm:px-6'}`}>
+    <div className={`app-shell transition-[padding] ${isFullscreen ? 'app-shell--fullscreen' : ''}`}>
       {showHero && <Header />}
 
       <div className="mx-auto max-w-6xl">
-        <div className="sticky top-2 z-20 mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center">
+        <div className="app-toolbar sticky z-20 mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center">
           <TabNav />
           <div className="flex self-end gap-2 sm:self-auto">
             <MobileInstallButton />
